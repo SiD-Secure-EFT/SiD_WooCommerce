@@ -13,4 +13,4 @@ Please submit pull requests with any tweaks, features or fixes you would like to
 
 ## About SiD Instant EFT
 
-[SiD Secure EFT](https://sidpayment.com/) SID Secure EFT is a secure payment method that allows you to make quick online payments without a credit card.
+[SiD Secure EFT](https://sidpayment.com/) is a secure payment method that allows you to make quick online payments without a credit card.
