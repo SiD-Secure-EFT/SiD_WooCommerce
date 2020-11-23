@@ -6,7 +6,7 @@ This is the SiD Secure EFT plugin for WooCommerce. Please feel free to contact t
 ## Installation
 [![How To Setup SiD Secure EFT for WooCommerce](https://www.appinlet.com/wp-content/uploads/2020/03/How-To-Setup-SiD-Secure-EFT-for-WooCommerce-scaled.jpg)](https://www.youtube.com/watch?v=zc9vPePRrfQ "How To Setup SiD Secure EFT for WooCommerce")
 
-Please navigate to the [releases page](https://github.com/SiD-Instant-EFT/SiD_WooCommerce/releases), download the latest release (v1.0.0) and unzip. You will them be able to follow the integration guide PDF which is included in the zip.
+Please navigate to the [releases page](https://github.com/SiD-Instant-EFT/SiD_WooCommerce/releases), download the latest release (v1.0.0) and unzip. You will then be able to follow the integration guide PDF which is included in the zip.
 
 ## Collaboration
 
