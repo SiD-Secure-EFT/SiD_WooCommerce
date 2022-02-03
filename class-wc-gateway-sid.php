@@ -1,21 +1,21 @@
 <?php
 /**
  * Plugin Name: SiD Secure EFT for WooCommerce
- * Plugin URI: https://github.com/SiD-Instant-EFT/SiD_WooCommerce
- * Description: Accept payments for WooCommerce using SiD Secure EFT's service
- * Version 1.0.0
- * Tested: 5.3.2
- * Author: PayGate (Pty) Ltd
- * Author URI: https://www.paygate.co.za/
- * Developer: App Inlet (Pty) Ltd
- * Developer URI: https://www.appinlet.com/
+ * Plugin URI: http://www.sidpayment.com
+ * Description: Extends WooCommerce with SiD Secure EFT payment gateway.
+ * Version: 1.0.1
+ * Tested: 5.9.0
  *
- * WC requires at least: 3.0
- * WC tested up to: 3.9
+ * Author: SiD Secure EFT (Pty) Ltd
  *
- * Copyright: © 2020 PayGate (Pty) Ltd.
+ * Copyright (c) 2022 SiD Secure EFT
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * Developer: App Inlet (Pty) Ltd
+ *
+ * WC requires at least: 3.0
+ * WC tested up to: 6.0
  */
 
 if ( !defined( 'ABSPATH' ) ) {
@@ -80,7 +80,8 @@ function init_wc_sid_class()
 
         public function __construct()
         {
-
+            $this->method_title       = __( 'SiD Secure EFT', 'sid' );
+            $this->method_description = 'SiD Secure EFT works by sending the customer to the SiD gateway';
             $this->init_settings();
 
             $this->init_form_fields();
@@ -114,13 +115,14 @@ function init_wc_sid_class()
             $this->config = array(
                 'slug'               => plugin_basename( __FILE__ ),
                 'proper_folder_name' => 'sid_woocommerce',
-                'api_url'            => 'https://api.github.com/repos/SiD-Instant-EFT/SiD_WooCommerce',
-                'github_url'         => 'https://github.com/SiD-Instant-EFT/SiD_WooCommerce',
-                'zip_url'            => 'https://github.com/SiD-Instant-EFT/SiD_WooCommerce/archive/master.zip',
-                'homepage'           => 'https://github.com/SiD-Instant-EFT/SiD_WooCommerce',
+                'api_url'            => 'https://api.github.com/repos/SiD-Secure-EFT/SiD_WooCommerce',
+                'raw_url'            => 'https://raw.github.com/SiD-Secure-EFT/SiD_WooCommerce/master',
+                'github_url'         => 'https://github.com/SiD-Secure-EFT/SiD_WooCommerce',
+                'zip_url'            => 'https://github.com/SiD-Secure-EFT/SiD_WooCommerce/archive/master.zip',
+                'homepage'           => 'https://github.com/SiD-Secure-EFT/SiD_WooCommerce',
                 'sslverify'          => true,
                 'requires'           => '4.0',
-                'tested'             => '5.3.2',
+                'tested'             => '5.9.0',
                 'readme'             => 'README.md',
                 'access_token'       => '',
             );
@@ -194,11 +196,11 @@ function init_wc_sid_class()
             global $woocommerce;
             $order = new WC_Order( $order_id );
 
-            $order_id      = $order->id;
+            $order_id      = $order->get_id();
             $order_total   = $order->get_total();
             $currency      = get_woocommerce_currency();
             $merchant_code = $this->merchant_code;
-            $order_key     = $order->order_key;
+            $order_key     = $order->get_order_key();
             $private_key   = $this->private_key;
 
             $consistent = strtoupper( hash( "sha512", $merchant_code . $currency . "ZA" . $order_id . $order_total . $order_key . $private_key ) );
@@ -283,6 +285,7 @@ function init_wc_sid_class()
             if ( strtoupper( $sid_status ) == self::SID_STATUS_CANCELLED || !is_sid_order_successful( $sid_reference, $sid_amount, $this->merchant_code, $this->username, $this->password, $sid_country, $sid_currency ) ) {
                 $cancelled_message = sprintf( __( 'Payment %s.', 'woocommerce' ), $sid_status );
                 $order->update_status( 'failed', $cancelled_message );
+                $order->add_order_note( "Failed payment from SiD Secure EFT (TNXID: $sid_tnxid)" );
                 wc_add_notice( 'Your transaction has failed.', $notice_type = 'error' );
                 return false;
             } elseif ( strtoupper( $sid_status ) == self::SID_STATUS_COMPLETED ) {

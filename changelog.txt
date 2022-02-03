@@ -1,4 +1,10 @@
 =======================================================================
 Date        :   Version:    Description
 =======================================================================
-2020-02-14  :   1.0.0       Initial release
+2022-02-03  :   1.0.1       Added GitHub updater functionality.
+                            Tested with WooCommerce 6.0 and Wordpress 5.9
+                            SiD Secure EFT branding update. 
+
+2020-02-14  :   1.0.0       Minor changes and formatting.
+                            Logo and text updated.
+                            First version.
