@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2020 PayGate (Pty) Ltd
+ * Copyright (c) 2023 SiD Secure EFT
  *
  * Author: App Inlet (Pty) Ltd
  *

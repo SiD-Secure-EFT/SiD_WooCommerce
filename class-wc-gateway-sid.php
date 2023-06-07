@@ -3,19 +3,19 @@
  * Plugin Name: SiD Secure EFT for WooCommerce
  * Plugin URI: http://www.sidpayment.com
  * Description: Extends WooCommerce with SiD Secure EFT payment gateway.
- * Version: 1.0.1
- * Tested: 5.9.0
+ * Version: 1.0.2
+ * Tested: 6.2.2
  *
  * Author: SiD Secure EFT (Pty) Ltd
  *
- * Copyright (c) 2022 SiD Secure EFT
+ * Copyright (c) 2023 SiD Secure EFT
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
  * Developer: App Inlet (Pty) Ltd
  *
- * WC requires at least: 3.0
- * WC tested up to: 6.0
+ * WC requires at least: 6.0
+ * WC tested up to: 7.7.2
  */
 
 if ( !defined( 'ABSPATH' ) ) {
@@ -121,8 +121,8 @@ function init_wc_sid_class()
                 'zip_url'            => 'https://github.com/SiD-Secure-EFT/SiD_WooCommerce/archive/master.zip',
                 'homepage'           => 'https://github.com/SiD-Secure-EFT/SiD_WooCommerce',
                 'sslverify'          => true,
-                'requires'           => '4.0',
-                'tested'             => '5.9.0',
+                'requires'           => '5.9.0',
+                'tested'             => '6.2.2',
                 'readme'             => 'README.md',
                 'access_token'       => '',
             );

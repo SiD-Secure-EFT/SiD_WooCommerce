@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2022 SiD Secure EFT
+ * Copyright (c) 2023 SiD Secure EFT
  *
  * Author: App Inlet (Pty) Ltd
  *
