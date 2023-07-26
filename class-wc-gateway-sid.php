@@ -3,7 +3,7 @@
  * Plugin Name: SiD Secure EFT for WooCommerce
  * Plugin URI: http://www.sidpayment.com
  * Description: Extends WooCommerce with SiD Secure EFT payment gateway.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Tested: 6.2.2
  *
  * Author: SiD Secure EFT (Pty) Ltd
@@ -15,8 +15,9 @@
  * Developer: App Inlet (Pty) Ltd
  *
  * WC requires at least: 6.0
- * WC tested up to: 7.7.2
+ * WC tested up to: 7.9.0
  */
+require_once "includes/SidAPI.php";
 
 if ( !defined( 'ABSPATH' ) ) {
     exit;
@@ -37,7 +38,6 @@ function frontend_includes()
     include_once 'includes/class-wc-customer.php'; // Customer class
     include_once 'includes/class-wc-shortcodes.php'; // Shortcodes class
     include_once 'includes/class-wc-https.php'; // https Helper
-    include_once 'includes/sid_functions.php';
 }
 
 if ( !defined( 'WP_CONTENT_URL' ) ) {
@@ -60,7 +60,6 @@ define( "WC_SID_PLUGINPATH", "/" . plugin_basename( dirname( __FILE__ ) ) );
 define( 'WC_SID_BASE_URL', WP_PLUGIN_URL . WC_SID_PLUGINPATH );
 define( 'WC_SID_BASE_DIR', WP_PLUGIN_DIR . WC_SID_PLUGINPATH );
 
-require_once WC_SID_BASE_DIR . '/includes/sid_functions.php';
 require_once 'classes/updater.class.php';
 
 function init_wc_sid_class()
@@ -192,7 +191,6 @@ function init_wc_sid_class()
 
         function get_sid_args( $order_id )
         {
-
             global $woocommerce;
             $order = new WC_Order( $order_id );
 
@@ -220,7 +218,6 @@ function init_wc_sid_class()
 
         function process_payment( $order_id )
         {
-
             $order    = wc_get_order( $order_id );
             $sid_args = $this->get_sid_args( $order_id );
             $url_args = http_build_query( $sid_args, '', '&' );
@@ -242,9 +239,6 @@ function init_wc_sid_class()
         private function process_sid_response()
         {
             global $woocommerce;
-            if ( !function_exists( 'is_sid_order_successful' ) ) {
-                include_once dirname( __FILE__ ) . '\includes\sid_functions.php';
-            }
 
             $sid_status     = strtoupper( $_REQUEST["SID_STATUS"] );
             $sid_merchant   = $_REQUEST["SID_MERCHANT"];
@@ -276,19 +270,31 @@ function init_wc_sid_class()
             $order_id = $sid_reference;
             $order    = new WC_Order( $order_id );
 
-            if ( floatval( $order->get_total() ) != floatval( $sid_amount ) || get_woocommerce_currency() != strtoupper( $sid_currency ) ) {
+            $queryData = [
+                "sellerReference"   => $order_id,
+                "startDate"          => $order->get_date_created()->date("Y-m-d"),
+                "endDate"            => date("Y-m-d")
+            ];
+
+            $sidAPI = new SidAPI($queryData, $this->username, $this->password);
+
+            if (floatval( $order->get_total() ) != floatval( $sid_amount )
+                || get_woocommerce_currency() != strtoupper( $sid_currency )
+            ) {
                 $error_msg = sprintf( __( 'Validation error: SiD Secure EFT payment amount (%1s %2s) does not match order amount.', 'woocommerce' ), $sid_currency, $sid_amount );
                 $order->update_status( 'on-hold', $error_msg );
                 wc_add_notice( 'Validation error: SiD Secure EFT payment amounts do not match order amount.', $notice_type = 'error' );
                 return false;
             }
-            if ( strtoupper( $sid_status ) == self::SID_STATUS_CANCELLED || !is_sid_order_successful( $sid_reference, $sid_amount, $this->merchant_code, $this->username, $this->password, $sid_country, $sid_currency ) ) {
+            if (strtoupper( $sid_status ) == self::SID_STATUS_CANCELLED
+                || $sidAPI->retrieveTransaction()->status !== "COMPLETED"
+            ) {
                 $cancelled_message = sprintf( __( 'Payment %s.', 'woocommerce' ), $sid_status );
                 $order->update_status( 'failed', $cancelled_message );
                 $order->add_order_note( "Failed payment from SiD Secure EFT (TNXID: $sid_tnxid)" );
                 wc_add_notice( 'Your transaction has failed.', $notice_type = 'error' );
                 return false;
-            } elseif ( strtoupper( $sid_status ) == self::SID_STATUS_COMPLETED ) {
+            } elseif (strtoupper( $sid_status ) == self::SID_STATUS_COMPLETED) {
                 if ( !in_array( strtolower( $order->status ), array( 'completed', 'processing' ) ) ) {
                     $order->add_order_note( "Success payment from SiD Secure EFT (TNXID: $sid_tnxid)" );
                     $order->payment_complete();
