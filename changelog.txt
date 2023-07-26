@@ -2,6 +2,9 @@
 Date        :   Version:    Description
 =======================================================================
 
+2023-07-26  :   1.0.3       Tested with WooCommerce 7.9.0.
+                            Update SiD API call.
+
 2023-06-07  :   1.0.2       Tested with WooCommerce 7.7.2 and Wordpress 6.2.2.
                             Update for PHP 8.0.
                             Add Buyer Return and Notify URL configuration instructions.
