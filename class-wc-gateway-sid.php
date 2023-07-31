@@ -3,7 +3,7 @@
  * Plugin Name: SiD Secure EFT for WooCommerce
  * Plugin URI: http://www.sidpayment.com
  * Description: Extends WooCommerce with SiD Secure EFT payment gateway.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Tested: 6.2.2
  *
  * Author: SiD Secure EFT (Pty) Ltd
@@ -295,7 +295,7 @@ function init_wc_sid_class()
                 wc_add_notice( 'Your transaction has failed.', $notice_type = 'error' );
                 return false;
             } elseif (strtoupper( $sid_status ) == self::SID_STATUS_COMPLETED) {
-                if ( !in_array( strtolower( $order->status ), array( 'completed', 'processing' ) ) ) {
+                if ( !in_array( strtolower( $order->get_status() ), array( 'completed', 'processing' ) ) ) {
                     $order->add_order_note( "Success payment from SiD Secure EFT (TNXID: $sid_tnxid)" );
                     $order->payment_complete();
                     $order->reduce_order_stock();
