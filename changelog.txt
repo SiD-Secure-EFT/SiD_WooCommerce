@@ -2,6 +2,11 @@
 Date        :   Version:    Description
 =======================================================================
 
+2024-08-16  :   1.1.0       Added WooCommerce Blocks support.
+                            Tested with WooCommerce 9.1.4.
+                            Code Quality improvements.
+                            Added WooCommerce HPOS compatibility.
+
 2023-07-31  :   1.0.4       Replace deprecated order status method.
 
 2023-07-26  :   1.0.3       Tested with WooCommerce 7.9.0.
@@ -13,7 +18,7 @@ Date        :   Version:    Description
 
 2022-02-03  :   1.0.1       Added GitHub updater functionality.
                             Tested with WooCommerce 6.0 and Wordpress 5.9
-                            SiD Secure EFT branding update. 
+                            SiD Secure EFT branding update.
 
 2020-02-14  :   1.0.0       Minor changes and formatting.
                             Logo and text updated.

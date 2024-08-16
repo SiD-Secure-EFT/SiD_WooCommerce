@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023 SiD Secure EFT
+ * Copyright (c) 2024 SiD Secure EFT
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -32,6 +32,7 @@ class SidAPI
     public function retrieveTransaction(): ?stdClass
     {
         $apiQuery = self::API_BASE . "/transactions" . $this->buildQueryString();
+
         return end(json_decode($this->doAPICall($apiQuery))->transactions) ?? null;
     }
 
@@ -45,12 +46,14 @@ class SidAPI
         foreach ($this->queryArr as $query => $value) {
             $queryString .= $query . "=" . $value . "&";
         }
+
         return rtrim($queryString, "&");
     }
 
     /**
      * @param $transactionId
      * @param $amount
+     *
      * @return bool
      */
     public function processRefund($transactionId, $amount): bool
@@ -65,7 +68,10 @@ class SidAPI
 
         if ($refundReport->refundId ?? "" === "1") {
             $this->queryArr["refundAmount"] = $amount;
-            $submitRefund = json_decode($this->doAPICall(self::API_BASE . "/refunds", $this->queryArr));
+            $submitRefund                   = json_decode(
+                $this->doAPICall(self::API_BASE . "/refunds", $this->queryArr)
+            );
+
             return $submitRefund->refundId === "3";
         } else {
             return false;
@@ -75,29 +81,26 @@ class SidAPI
     /**
      * @param $uri
      * @param array $data
+     *
      * @return string
      */
     private function doAPICall($uri, array $data = []): string
     {
-        $ch = curl_init();
-        $curlConfig = array(
-            CURLOPT_URL => $uri,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_USERPWD => $this->username . ":" . $this->password
+        $args = array(
+            'headers' => array(
+                'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
+                'Content-Type'  => 'application/json',
+            ),
+            'body'    => !empty($data) ? wp_json_encode($data) : null,
+            'method'  => !empty($data) ? 'POST' : 'GET',
         );
 
-        if (!empty($data)) {
-            $curlConfig[CURLOPT_POST] = true;
-            $curlConfig[CURLOPT_POSTFIELDS] = json_encode($data);
+        $response = wp_remote_request($uri, $args);
+
+        if (is_wp_error($response)) {
+            return $response->get_error_message();
         }
 
-        curl_setopt_array($ch, $curlConfig);
-        $response = curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            return curl_error($ch);
-        }
-
-        return $response;
+        return wp_remote_retrieve_body($response);
     }
 }
