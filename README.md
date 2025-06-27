@@ -1,17 +1,37 @@
 # SiD_WooCommerce
-## SiD Secure EFT plugin v1.1.0 for WooCommerce v9.1.4
 
-This is the SiD Secure EFT plugin for WooCommerce. Please feel free to contact the SiD Secure EFT support team at support@sidpayment.com should you require any assistance.
+## SiD Secure EFT plugin v1.2.0 for WooCommerce v9.9
+
+This is the SiD Secure EFT plugin for WooCommerce. Please feel free to contact the Payfast support team at
+support@payfast.io should you require any assistance.
 
 ## Installation
-[![How To Setup SiD Secure EFT for WooCommerce](https://appinlet.com/wp-content/uploads/2021/01/How-To-Setup-SiD-Secure-EFT-for-WooCommerce.jpg)](https://www.youtube.com/watch?v=zc9vPePRrfQ "How To Setup SiD Secure EFT for WooCommerce")
 
-Please navigate to the [releases page](https://github.com/SiD-Secure-EFT/SiD_WooCommerce/releases), download the latest release (v1.1.0) and unzip. You will then be able to follow the integration guide PDF which is included in the zip.
+1. **Download the Plugin**
+
+    - Visit the [releases page](https://github.com/SiD-Secure-EFT/SiD_WooCommerce/releases) and
+      download [sid_woocommerce.zip](https://github.com/SiD-Secure-EFT/SiD_WooCommerce/releases/download/v1.2.0/sid_woocommerce.zip).
+
+2. **Install the Plugin**
+
+    - Log in to your WordPress Admin panel.
+    - Navigate to **Plugins > Add New > Upload Plugin**.
+    - Click **Choose File** and select `sid_woocommerce.zip`.
+    - Click **Install Now**.
+    - Click **Activate Plugin**.
+
+3. **Configure the Plugin**
+
+    - Navigate to **WooCommerce > Settings**.
+        - Go to the **Payments** tab.
+        - Select **SiD Secure EFT** from the list of payment methods.
+        - Tick the **Enable SiD Secure EFT** checkbox.
+        - Configure the plugin by entering your SiD Secure EFT credentials and preferences.
+        - Set both the **Buyer Return URL** and **Merchant Notification URL** to the same URL in the format:  
+          `https://DOMAIN.NAME?wc-api=WC_Gateway_SID`
+        - Request this configuration by emailing [support@payfast.io](mailto:support@payfast.io) or through the
+          **Account Settings** tab in the SiD Merchant Portal.
 
 ## Collaboration
 
 Please submit pull requests with any tweaks, features or fixes you would like to share.
-
-## About SiD Instant EFT
-
-[SiD Secure EFT](https://sidpayment.com/) is a secure payment method that allows you to make quick online payments without a credit card.
