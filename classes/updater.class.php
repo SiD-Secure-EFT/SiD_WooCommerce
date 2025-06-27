@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024 SiD Secure EFT
+ * Copyright (c) 2025 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -134,16 +134,6 @@ class WP_GitHub_Updater_SiDWC
     }
 
     /**
-     * Check wether or not the transients need to be overruled and API needs to be called for every single page load
-     *
-     * @return bool overrule or not
-     */
-    public function overrule_transients()
-    {
-        return defined('WP_GITHUB_FORCE_UPDATE') && WP_GITHUB_FORCE_UPDATE;
-    }
-
-    /**
      * Set defaults
      *
      * @return void
@@ -213,51 +203,6 @@ class WP_GitHub_Updater_SiDWC
     }
 
     /**
-     * Callback fn for the http_request_timeout filter
-     *
-     * @return int timeout value
-     * @since 1.0
-     */
-    public function http_request_timeout()
-    {
-        return 2;
-    }
-
-    /**
-     * Callback fn for the http_request_args filter
-     *
-     * @param unknown $args
-     * @param unknown $url
-     *
-     * @return mixed
-     */
-    public function http_request_sslverify($args, $url)
-    {
-        if ($this->config['zip_url'] == $url) {
-            $args['sslverify'] = $this->config['sslverify'];
-        }
-
-        return $args;
-    }
-
-    /**
-     * Get Icons from GitHub
-     *
-     * @return array $icons the plugin icons
-     * @since 1.7
-     */
-    public function get_icons()
-    {
-        $assest_url = $this->config['raw_url'] . '/assets/images/';
-
-        return array(
-            'default' => $assest_url . 'icon-128x128.png',
-            '1x'      => $assest_url . 'icon-128x128.png',
-            '2x'      => $assest_url . 'icon-256x256.png',
-        );
-    }
-
-    /**
      * Get Raw Response from GitHub
      *
      * @return int $raw_response the raw response
@@ -268,6 +213,25 @@ class WP_GitHub_Updater_SiDWC
         return $this->remote_get(
             trailingslashit($this->config['raw_url']) . basename($this->config['slug'])
         );
+    }
+
+    /**
+     * Interact with GitHub
+     *
+     * @param string $query
+     *
+     * @return mixed
+     * @since 1.6
+     */
+    public function remote_get($query)
+    {
+        if (!empty($this->config['access_token'])) {
+            $query = add_query_arg(array('access_token' => $this->config['access_token']), $query);
+        }
+
+        return wp_remote_get($query, array(
+            'sslverify' => $this->config['sslverify'],
+        ));
     }
 
     /**
@@ -307,6 +271,16 @@ class WP_GitHub_Updater_SiDWC
     }
 
     /**
+     * Check wether or not the transients need to be overruled and API needs to be called for every single page load
+     *
+     * @return bool overrule or not
+     */
+    public function overrule_transients()
+    {
+        return defined('WP_GITHUB_FORCE_UPDATE') && WP_GITHUB_FORCE_UPDATE;
+    }
+
+    /**
      * Get New Tested from GitHub
      *
      * @return int $tested the tested number
@@ -343,22 +317,33 @@ class WP_GitHub_Updater_SiDWC
     }
 
     /**
-     * Interact with GitHub
+     * Get Icons from GitHub
      *
-     * @param string $query
-     *
-     * @return mixed
-     * @since 1.6
+     * @return array $icons the plugin icons
+     * @since 1.7
      */
-    public function remote_get($query)
+    public function get_icons()
     {
-        if (!empty($this->config['access_token'])) {
-            $query = add_query_arg(array('access_token' => $this->config['access_token']), $query);
-        }
+        $assest_url = $this->config['raw_url'] . '/assets/images/';
 
-        return wp_remote_get($query, array(
-            'sslverify' => $this->config['sslverify'],
-        ));
+        return array(
+            'default' => $assest_url . 'icon-128x128.png',
+            '1x'      => $assest_url . 'icon-128x128.png',
+            '2x'      => $assest_url . 'icon-256x256.png',
+        );
+    }
+
+    /**
+     * Get update date
+     *
+     * @return string $date the date
+     * @since 1.0
+     */
+    public function get_date()
+    {
+        $_date = $this->get_github_data();
+
+        return (!empty($_date->updated_at)) ? gmdate('Y-m-d', strtotime($_date->updated_at)) : false;
     }
 
     /**
@@ -395,19 +380,6 @@ class WP_GitHub_Updater_SiDWC
     }
 
     /**
-     * Get update date
-     *
-     * @return string $date the date
-     * @since 1.0
-     */
-    public function get_date()
-    {
-        $_date = $this->get_github_data();
-
-        return (!empty($_date->updated_at)) ? gmdate('Y-m-d', strtotime($_date->updated_at)) : false;
-    }
-
-    /**
      * Get plugin description
      *
      * @return string $description the description
@@ -439,7 +411,7 @@ class WP_GitHub_Updater_SiDWC
         }
 
         // Return.
-        return (!empty($_changelog) ? $_changelog : 'Could not get changelog from server.');
+        return !empty($_changelog) ? $_changelog : 'Could not get changelog from server.';
     }
 
     /**
@@ -453,6 +425,34 @@ class WP_GitHub_Updater_SiDWC
         include_once ABSPATH . '/wp-admin/includes/plugin.php';
 
         return get_plugin_data(WP_PLUGIN_DIR . '/' . $this->config['slug']);
+    }
+
+    /**
+     * Callback fn for the http_request_timeout filter
+     *
+     * @return int timeout value
+     * @since 1.0
+     */
+    public function http_request_timeout()
+    {
+        return 2;
+    }
+
+    /**
+     * Callback fn for the http_request_args filter
+     *
+     * @param unknown $args
+     * @param unknown $url
+     *
+     * @return mixed
+     */
+    public function http_request_sslverify($args, $url)
+    {
+        if ($this->config['zip_url'] == $url) {
+            $args['sslverify'] = $this->config['sslverify'];
+        }
+
+        return $args;
     }
 
     /**
@@ -479,7 +479,7 @@ class WP_GitHub_Updater_SiDWC
             $response->new_version = $this->config['new_version'];
             $response->slug        = $this->config['proper_folder_name'];
             $response->url         = add_query_arg(array('access_token' => $this->config['access_token']),
-                                                   $this->config['github_url']);
+                $this->config['github_url']);
             $response->package     = $this->config['zip_url'];
             $response->icons       = $this->config['icons'];
             $response->tested      = $this->config['new_tested'];
@@ -559,9 +559,9 @@ class WP_GitHub_Updater_SiDWC
         // Output the update message.
         $fail    = __(
             'The plugin has been updated, but could not be reactivated. Please reactivate it manually.',
-            'github_plugin_updater'
+            'sid_woocommerce'
         );
-        $success = __('Plugin reactivated successfully.', 'github_plugin_updater');
+        $success = __('Plugin reactivated successfully.', 'sid_woocommerce');
         echo is_wp_error($activate) ? esc_html($fail) : esc_html($success);
 
         return $result;

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024 SiD Secure EFT
+ * Copyright (c) 2025 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -10,7 +10,7 @@
 class SidAPI
 {
     public const API_BASE = "https://www.sidpayment.com/services/api/v30";
-    private array $queryArr;
+    private array  $queryArr;
     private string $username;
     private string $password;
 
@@ -51,6 +51,32 @@ class SidAPI
     }
 
     /**
+     * @param $uri
+     * @param array $data
+     *
+     * @return string
+     */
+    private function doAPICall($uri, array $data = []): string
+    {
+        $args = array(
+            'headers' => array(
+                'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
+                'Content-Type'  => 'application/json',
+            ),
+            'body'    => !empty($data) ? wp_json_encode($data) : null,
+            'method'  => !empty($data) ? 'POST' : 'GET',
+        );
+
+        $response = wp_remote_request($uri, $args);
+
+        if (is_wp_error($response)) {
+            return $response->get_error_message();
+        }
+
+        return wp_remote_retrieve_body($response);
+    }
+
+    /**
      * @param $transactionId
      * @param $amount
      *
@@ -76,31 +102,5 @@ class SidAPI
         } else {
             return false;
         }
-    }
-
-    /**
-     * @param $uri
-     * @param array $data
-     *
-     * @return string
-     */
-    private function doAPICall($uri, array $data = []): string
-    {
-        $args = array(
-            'headers' => array(
-                'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
-                'Content-Type'  => 'application/json',
-            ),
-            'body'    => !empty($data) ? wp_json_encode($data) : null,
-            'method'  => !empty($data) ? 'POST' : 'GET',
-        );
-
-        $response = wp_remote_request($uri, $args);
-
-        if (is_wp_error($response)) {
-            return $response->get_error_message();
-        }
-
-        return wp_remote_retrieve_body($response);
     }
 }
